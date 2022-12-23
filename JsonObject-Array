@@ -1,0 +1,41 @@
+import com.sap.gateway.ip.core.customdev.util.Message;
+import java.util.HashMap;
+import groovy.json.*;
+
+def Message processData(Message message){           
+
+    def body = message.getBody(String)
+    def jsonParser = new JsonSlurper()
+    def jsonObject = jsonParser.parseText(body)  
+
+     def json = JsonOutput.toJson(
+         "Movie Theater" : jsonParser.parseText(JsonOutput.toJson(
+             Title : jsonObject.Cinema.Titulo,
+             Resume : jsonObject.Cinema.Resumo,
+             Year :   jsonObject.Cinema.Ano,
+             Genre : jsonParser.parseText(JsonOutput.toJson(
+                 Adventure : jsonParser.parseText(JsonOutput.toJson(
+                     movie1 : jsonObject.Cinema.Genero.Aventura.Filme1,
+                     movie2 : jsonObject.Cinema.Genero["Ficção"].Filme2  
+             )),
+                 Action : jsonParser.parseText(JsonOutput.toJson(
+                     movie1 : jsonObject.Cinema.Genero.Ação.Filme1,
+                     movie2 : jsonObject.Cinema.Genero["Ação"].Filme2
+                 )),
+                 fiction : jsonParser.parseText(JsonOutput.toJson(
+                     movie1 : jsonObject.Cinema.Genero["Ficção"].Filme1,
+                     movie2 : jsonObject.Cinema.Genero["Ficção"].Filme2
+                 )),
+                 novaChave : jsonParser.parseText(JsonOutput.toJson(
+                     novaChave : "valor da nova chave"
+                 ))
+             ))      
+            
+            
+                 
+         )));
+
+     message.setBody(JsonOutput.prettyPrint(json))    
+
+   return message;
+}
